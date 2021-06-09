@@ -9,8 +9,8 @@ from torchvision import datasets, transforms
 from src_code import mobilenetv2
 from torchsummaryX import summary
 
-dirpath = os.path.dirname(os.path.abspath(__file__))
-rootpath = os.path.abspath(os.path.split(dirpath) + "/../../")
+dirpath = os.path.split(os.path.abspath(__file__))[0]
+rootpath = os.path.abspath(dirpath + "/../../")
 
 parser = argparse.ArgumentParser(description='PyTorch Digital Mammography Training')
 parser.add_argument('--lr', default=0.001, type=float, help='learning rate')
