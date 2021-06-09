@@ -106,7 +106,7 @@ class MobileNetV2(nn.Module):
         ]
 
         # load channel index
-        f = open('../1_pruning/checkpoint/channel_index.txt')
+        f = open('../1_pruning/checkpoint/best_channel_index.txt')
         lines = f.readlines()
         index_code = []
         channel_number = []

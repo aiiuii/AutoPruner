@@ -9,20 +9,23 @@ from torchvision import datasets, transforms
 from src_code import mobilenetv2
 from torchsummaryX import summary
 
+dirpath = os.path.dirname(os.path.abspath(__file__))
+rootpath = os.path.abspath(os.path.split(dirpath) + "/../../")
+
 parser = argparse.ArgumentParser(description='PyTorch Digital Mammography Training')
 parser.add_argument('--lr', default=0.001, type=float, help='learning rate')
 parser.add_argument('--weight_decay', default=1e-4, type=float, help='weight decay')
-parser.add_argument('--batch_size', default=256, type=int, help='batch size')
+parser.add_argument('--batch_size', default=128, type=int, help='batch size')
 parser.add_argument('--num_epochs', default=0, type=int, help='number of training epochs')
 parser.add_argument('--lr_decay_epoch', default=10, type=int, help='learning rate decay epoch')
-parser.add_argument('--data_base', default='/mnt/ramdisk/ImageNet', type=str, help='the path of dataset')
-parser.add_argument('--gpu_id', default='4,5,6,7', type=str,
+parser.add_argument('--data_base', default=(rootpath + '/imagenet-mini'), type=str, help='the path of dataset')
+parser.add_argument('--gpu_id', default='0', type=str,
                     help='id(s) for CUDA_VISIBLE_DEVICES')
 parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
                     help='manual epoch number (useful on restarts)')
 parser.add_argument('--print-freq', '-p', default=20, type=int,
                     metavar='N', help='print frequency (default: 10)')
-parser.add_argument('--ft_model_path', default='/mnt/data3/luojh/project/6_CURL/Journal/pretrained_model/ImageNet/mobilenetv2_1.0-0c6065bc.pth',
+parser.add_argument('--ft_model_path', default=(rootpath + '/mobilenetv2_1.0-0c6065bc.pth'),
                     type=str, help='the path of fine tuned model')
 args = parser.parse_args()
 os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu_id
@@ -68,9 +71,9 @@ def main():
         x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x])
         for x in ['train', 'val']
     }
-    train_loader = torch.utils.data.DataLoader(dsets['train'], batch_size=args.batch_size, shuffle=True, num_workers=8,
+    train_loader = torch.utils.data.DataLoader(dsets['train'], batch_size=args.batch_size, shuffle=True, num_workers=2,
                                                pin_memory=True)
-    val_loader = torch.utils.data.DataLoader(dsets['val'], batch_size=args.batch_size, shuffle=False, num_workers=8,
+    val_loader = torch.utils.data.DataLoader(dsets['val'], batch_size=args.batch_size, shuffle=False, num_workers=2,
                                              pin_memory=True)
     print('data_loader_success!')
 

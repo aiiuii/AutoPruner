@@ -9,20 +9,25 @@ from torchvision import datasets, transforms
 import mobilenetv2
 from torchsummaryX import summary
 
+dirpath = os.path.dirname(os.path.abspath(__file__))
+rootpath = os.path.abspath(os.path.split(dirpath) + "/../../")
+
 parser = argparse.ArgumentParser(description='PyTorch Digital Mammography Training')
 parser.add_argument('--lr', default=0.001, type=float, help='learning rate')
 parser.add_argument('--weight_decay', default=1e-4, type=float, help='weight decay')
-parser.add_argument('--batch_size', default=64, type=int, help='batch size')
+parser.add_argument('--batch_size', default=128, type=int, help='batch size')
 parser.add_argument('--num_epochs', default=0, type=int, help='number of training epochs')
 parser.add_argument('--lr_decay_epoch', default=10, type=int, help='learning rate decay epoch')
-parser.add_argument('--data_base', default='/mnt/ramdisk/ImageNet', type=str, help='the path of dataset')
-parser.add_argument('--gpu_id', default='2', type=str,
+parser.add_argument('--data_base', default=(rootpath+'/imagenet-mini'), type=str, help='the path of dataset')
+parser.add_argument('--gpu_id', default='0', type=str,
                     help='id(s) for CUDA_VISIBLE_DEVICES')
 parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
                     help='manual epoch number (useful on restarts)')
 parser.add_argument('--print-freq', '-p', default=20, type=int,
                     metavar='N', help='print frequency (default: 10)')
-parser.add_argument('--ft_model_path', default='mobilenetv2-pruned.pth',
+parser.add_argument('--ft_model_path', default=(rootpath+'/MobileNetv2/2_fine_tune/checkpoint/best_model.pth'),
+                    type=str, help='the path of fine tuned model')
+parser.add_argument('--channel_index_path', default=(rootpath+'/MobileNetv2/1_pruning/checkpoint/best_channel_index.txt'),
                     type=str, help='the path of fine tuned model')
 args = parser.parse_args()
 os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu_id
@@ -35,7 +40,7 @@ def main():
 
     # Phase 1 : Model setup
     print('\n[Phase 2] : Model setup')
-    model = mobilenetv2.MobileNetV2(args.ft_model_path)
+    model = mobilenetv2.MobileNetV2(args.ft_model_path, args.channel_index_path)
     model.eval()
     summary(model, torch.zeros((1, 3, 224, 224)))
     model_ft = torch.nn.DataParallel(model.cuda())
@@ -68,7 +73,7 @@ def main():
         x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x])
         for x in ['train', 'val']
     }
-    val_loader = torch.utils.data.DataLoader(dsets['val'], batch_size=args.batch_size, shuffle=False, num_workers=8,
+    val_loader = torch.utils.data.DataLoader(dsets['val'], batch_size=args.batch_size, shuffle=False, num_workers=2,
                                              pin_memory=True)
     print('data_loader_success!')
 

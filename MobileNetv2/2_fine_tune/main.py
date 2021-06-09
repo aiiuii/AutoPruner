@@ -10,14 +10,17 @@ from src_code import mobilenetv2
 from torchsummaryX import summary
 from math import cos, pi
 
+dirpath = os.path.dirname(os.path.abspath(__file__))
+rootpath = os.path.abspath(os.path.split(dirpath) + "/../../")
+
 parser = argparse.ArgumentParser(description='PyTorch Digital Mammography Training')
 parser.add_argument('--lr', default=0.01, type=float, help='learning rate')
 parser.add_argument('--weight_decay', default=4e-5, type=float, help='weight decay')
-parser.add_argument('--batch_size', default=256, type=int, help='batch size')
+parser.add_argument('--batch_size', default=128, type=int, help='batch size')
 parser.add_argument('--num_epochs', default=150, type=int, help='number of training epochs')
 parser.add_argument('--lr_decay_epoch', default=10, type=int, help='learning rate decay epoch')
-parser.add_argument('--data_base', default='/mnt/ramdisk/ImageNet', type=str, help='the path of dataset')
-parser.add_argument('--gpu_id', default='4,5,6,7', type=str,
+parser.add_argument('--data_base', default=(rootpath+'/imagenet-mini'), type=str, help='the path of dataset')
+parser.add_argument('--gpu_id', default='0', type=str,
                     help='id(s) for CUDA_VISIBLE_DEVICES')
 parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
                     help='manual epoch number (useful on restarts)')
@@ -36,14 +39,14 @@ def main():
 
     # Phase 1 : Model setup
     print('\n[Phase 2] : Model setup')
-    model = mobilenetv2.MobileNetV2('../1_pruning/checkpoint/model.pth')
+    model = mobilenetv2.MobileNetV2('../1_pruning/checkpoint/best_model.pth')
     model.eval()
     summary(model, torch.zeros((1, 3, 224, 224)))
     model_ft = torch.nn.DataParallel(model.cuda())
     cudnn.benchmark = True
     print("model setup success!")
     if args.resume:
-        weight = torch.load('checkpoint/model.pth')
+        weight = torch.load('checkpoint/best_model.pth')
         model_ft.load_state_dict(weight)
 
     # Phase 2 : Data Load
@@ -72,9 +75,9 @@ def main():
         x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x])
         for x in ['train', 'val']
     }
-    train_loader = torch.utils.data.DataLoader(dsets['train'], batch_size=args.batch_size, shuffle=True, num_workers=8,
+    train_loader = torch.utils.data.DataLoader(dsets['train'], batch_size=args.batch_size, shuffle=True, num_workers=2,
                                                pin_memory=True)
-    val_loader = torch.utils.data.DataLoader(dsets['val'], batch_size=args.batch_size, shuffle=False, num_workers=8,
+    val_loader = torch.utils.data.DataLoader(dsets['val'], batch_size=args.batch_size, shuffle=False, num_workers=2,
                                              pin_memory=True)
     print('data_loader_success!')
 
@@ -101,11 +104,13 @@ def main():
         is_best = prec1 > best_prec1
         if is_best:
             best_prec1 = prec1
-        print('best accuracy is {0:.3f}'.format(best_prec1))
-        folder_path = 'checkpoint'
-        if not os.path.exists(folder_path):
-            os.makedirs(folder_path)
-        torch.save(model_ft.state_dict(), folder_path+'/model.pth')
+            print('best accuracy is {0:.3f}'.format(best_prec1))
+            folder_path = 'checkpoint'
+            if not os.path.exists(folder_path):
+                os.makedirs(folder_path)
+            torch.save(model_ft.state_dict(), folder_path+'/model(prec@1={0:.3f}).pth'.format(best_prec1))
+
+    torch.save(model_ft.state_dict(), folder_path+'/best_model.pth')
 
 
 def train(train_loader, model, criterion, optimizer, epoch):
@@ -260,7 +265,7 @@ def accuracy(output, target, topk=(1,)):
 
     res = []
     for k in topk:
-        correct_k = correct[:k].view(-1).float().sum(0, keepdim=True)
+        correct_k = correct[:k].reshape(-1).float().sum(0, keepdim=True)
         res.append(correct_k.mul_(100.0 / batch_size))
     return res
 

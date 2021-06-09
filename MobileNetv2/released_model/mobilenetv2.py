@@ -92,7 +92,7 @@ class InvertedResidual(nn.Module):
 
 
 class MobileNetV2(nn.Module):
-    def __init__(self, model_path, num_classes=1000, width_mult=1.):
+    def __init__(self, model_path, channel_index_path, num_classes=1000, width_mult=1.):
         super(MobileNetV2, self).__init__()
         # setting of inverted residual blocks
         self.cfgs = [
@@ -107,8 +107,7 @@ class MobileNetV2(nn.Module):
         ]
 
         # load channel index
-        file_path = model_path.split('mobilenet')[0]
-        f = open('channel_index_AP.txt')
+        f = open(channel_index_path)
         lines = f.readlines()
         channel_number = []
         for line in lines:
