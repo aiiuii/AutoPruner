@@ -89,6 +89,7 @@ def main():
                                 momentum=0.9,
                                 weight_decay=args.weight_decay)
     validate(val_loader, model_ft, criterion)
+    folder_path = 'checkpoint'
     for epoch in range(args.start_epoch, args.num_epochs):
         # adjust_learning_rate(optimizer, epoch, 10)  # reduce lr every 3 epochs
 
@@ -105,7 +106,7 @@ def main():
         if is_best:
             best_prec1 = prec1
             print('best accuracy is {0:.3f}'.format(best_prec1))
-            folder_path = 'checkpoint'
+            
             if not os.path.exists(folder_path):
                 os.makedirs(folder_path)
             torch.save(model_ft.state_dict(), folder_path+'/model(prec@1={0:.3f}).pth'.format(best_prec1))
