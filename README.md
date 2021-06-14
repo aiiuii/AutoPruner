@@ -76,7 +76,7 @@ Feel free to contact me if you have any question (Jian-Hao Luo luojh@lamda.nju.e
 
 
 ---
-
+colab link : https://reurl.cc/a9aN07
 | Architecture  | Top-1 Acc.  | Top-5 Acc.  | #MACs   |
 | ------------- | ------------- | ------------- |  ------------- | 
 | MobileNetV2-1.0  | 72.19%  | 90.53%  | 300.79M  | 
