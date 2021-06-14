@@ -148,6 +148,9 @@ class MobileNetV2(nn.Module):
         return x
 
     def _initialize_weights(self, model_path, index_code):
+        if model_path == None:
+            return
+            
         model_weight = torch.load(model_path)
         my_weight = self.state_dict()
         my_keys = list(my_weight.keys())
