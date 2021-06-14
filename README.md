@@ -74,3 +74,14 @@ If you find this work is useful for your research, please cite:
 ## Contact
 Feel free to contact me if you have any question (Jian-Hao Luo luojh@lamda.nju.edu.cn or jianhao920@gmail.com).
 
+
+---
+
+| Architecture  | Top-1 Acc.  | Top-5 Acc.  | #MACs   |
+| ------------- | ------------- | ------------- |  ------------- | 
+| MobileNetV2-1.0  | 72.19%  | 90.53%  | 300.79M  | 
+| MobileNetV2-0.75 |  69.95%  | 88.99%  | 209.08M  |
+| MobileNetV2-1.0-mini  | 57.20%  | 82.02%  | 300.79M  |
+| AutoPruner-r=0.8 | 55.32% | 79.94% | 251.53M | 
+| AutoPruner-r=0.6 | 51.80% | 77.39% | 199.24M | 
+| AutoPruner-r=0.4 | 46.95% | 72.98% | 149.44M | 
