@@ -20,6 +20,7 @@ parser.add_argument('--batch_size', default=64, type=int, help='batch size')
 parser.add_argument('--num_epochs', default=150, type=int, help='number of training epochs')
 parser.add_argument('--lr_decay_epoch', default=10, type=int, help='learning rate decay epoch')
 parser.add_argument('--data_base', default=(rootpath+'/imagenet-mini'), type=str, help='the path of dataset')
+parser.add_argument('--channel_index_path', default='../1_pruning/checkpoint/best_channel_index.txt', type=str, help='the path of channel index ')
 parser.add_argument('--gpu_id', default='0', type=str,
                     help='id(s) for CUDA_VISIBLE_DEVICES')
 parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
@@ -39,7 +40,7 @@ def main():
 
     # Phase 1 : Model setup
     print('\n[Phase 2] : Model setup')
-    model = mobilenetv2.MobileNetV2('../1_pruning/checkpoint/best_model.pth')
+    model = mobilenetv2.MobileNetV2('../1_pruning/checkpoint/best_model.pth', args.channel_index_path)
     model.eval()
     summary(model, torch.zeros((1, 3, 224, 224)))
     model_ft = torch.nn.DataParallel(model.cuda())
